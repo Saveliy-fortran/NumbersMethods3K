@@ -51,7 +51,7 @@ public class Diffusion implements Calculation {
         Scanner scanner = new Scanner(System.in);
         intitialValue();
         boundValue();
-        System.out.print("Выберите схему: CR (схема Кранка-Николсона для модельного уравнения), ES(Явная схема) :\n> ");
+        System.out.print("Выберите схему: CR (схема Кранка-Николсона для модельного уравнения), ES(Явная схема для модельного уравнения) :\n> ");
         String output = scanner.next();
         switch (output){
             case "CR" : return solveEquationWithCrankaNicholsonForModelEquation();

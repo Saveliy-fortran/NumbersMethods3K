@@ -9,6 +9,7 @@ public class TestForSweepMethod {
     public void testForSweepMethod1() throws NonSquareArray {
         double[][] array = {{1, 2, 0, 0}, {2, 3, 1, 0}, {0, 1, 5, 6}, {0, 0, 1, 2}};
         double[] rightPart = {1,2,3,4};
+
         double[] x = SweepMethod.sweepMethod(array,rightPart);
 
         Assert.assertEquals(4, x.length);
