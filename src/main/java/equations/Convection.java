@@ -82,7 +82,7 @@ public class Convection implements Calculation {
                 for(int j = 0; j < nX - 1; j++){
                     v12[j] = 0.5*(u1[j+1] + u1[j]) - CFL*(u1[j+1] - u1[j])/2.0;
                 }
-                u2[i] = u1[i] - CFL*(v12[i-1] - v12[i]);
+                u2[i] = u1[i] - CFL*(v12[i] - v12[i-1]);
             }
             u2[0] = u2[nX-1];
             for (int i = 0; i < nX; i++){
