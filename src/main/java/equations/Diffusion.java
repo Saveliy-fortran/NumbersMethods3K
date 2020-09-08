@@ -116,7 +116,7 @@ public class Diffusion implements Calculation {
             C[Nx-1] = 0;
             D[Nx-1] = vN;
             try {
-                v2 = SweepMethod.sweepMethod(Nx, A, B, C, D);
+                v2 = SweepMethod.sweepMethod( A, B, C, D);
             } catch (NonSquareArray e){
                 System.out.println("Решение не получено, ошибка!");
             }

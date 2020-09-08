@@ -50,22 +50,22 @@ public class DiffusionOurEquation implements Calculation{
         double C[] = new double[Nx];
         double D[] = new double[Nx];
         for (int t = 0; t <= nT; t++) {
-            A[0] = -1;
-            B[0] = 1;
-            C[0] = 0;
+            A[0] = 0;
+            B[0] = -1;
+            C[0] = 1;
             D[0] = 0;
             for (int i = 1; i < Nx - 1; i++) {
-                A[i] = -density / pow(2 * h, 2) * (r[i] + r[i+1]);
-                B[i] = r[i]/dt + density/pow(2*h,2) * (r[i+1] + 2*r[i] + r[i-1]);
-                C[i] = -density/pow(2*h,2) * (r[i] + r[i-1]);
-                D[i] = r[i] * Aa * sin(w * dt * t) + density/pow(2*h,2) * ( (r[i+1] + r[i])*(v1[i+1] - v1[i]) - (r[i] + r[i-1])*(v1[i] - v1[i-1])) + r[i]*v1[i]/dt;
+                A[i] = -density * dt * (r[i] + r[i-1]);
+                B[i] = 4*h*h*r[i] + density*dt*(r[i+1]+r[i]) + density*dt*(r[i]+r[i-1]);
+                C[i] = -density * dt * (r[i+1]+r[i]);
+                D[i] = 4*h*h*dt*r[i]*Aa*sin(w*t*dt) + 4*h*h*r[i]*v1[i]+density*dt* ((r[i]+r[i-1])*(v1[i]-v1[i-1]) - (r[i+1]+r[i])*(v1[i+1]-v1[i]));
             }
             A[Nx - 1] = 0;
             B[Nx - 1] = 1;
             C[Nx - 1] = 0;
             D[Nx - 1] = 0;
             try {
-                v2 = SweepMethod.sweepMethod(Nx, A, B, C, D);
+                v2 = SweepMethod.sweepMethod( A, B, C, D);
             } catch (NonSquareArray e) {
                 System.out.println("Решение не получено, ошибка!");
             }
@@ -78,14 +78,16 @@ public class DiffusionOurEquation implements Calculation{
 
     public double[] solveEquationWithExplicitSchema(){
         System.out.println("Запущена явная схема! Для Обратная вторая задача Стокса в цилиндрической трубе  ");
-        for(int t = 0; t <= nT; t++) {
+        double t = dt;
+        for(int n = 1; n <= nT; n++) {
             for (int i = 1; i < Nx - 1; i++) {
-                v2[i] = v1[i] + density*dt/(2*r[i]*h*h) * ((r[i+1]+r[i])*(v1[i+1]-v1[i]) - (r[i]+r[i-1])*(v1[i]-v1[i-1])) + r[i]*Aa*sin(t*dt*w);
+                v2[i] = v1[i] + density*dt/(2*r[i]*h*h) * ((r[i+1]+r[i])*(v1[i+1]-v1[i]) - (r[i]+r[i-1])*(v1[i]-v1[i-1])) + dt*Aa*sin(t*w);
             }
             v2[0]=v2[1];
             for (int i = 0; i < v2.length; i++) {
                 v1[i] = v2[i];
             }
+            t=t+dt;
         }
         return v2;
     }
@@ -94,8 +96,15 @@ public class DiffusionOurEquation implements Calculation{
     public double[] solveEquation() throws NonSquareArray {
         Scanner scanner = new Scanner(System.in);
         intitialValue();
-        //boundValue();
-        return solveEquationWithCrankaNicholsonForStocksEquation();
+        System.out.println("Обратная вторая задача Стокса в цилиндрической трубе:");
+        System.out.print("Выберите схему: CR (схема Кранка-Николсона), ES(Явная схемая) :\n> ");
+        String output = scanner.next();
+        switch (output){
+            case "CR" : return solveEquationWithCrankaNicholsonForStocksEquation();
+            case "ES" : return solveEquationWithExplicitSchema();
+            default: System.out.println("Запущена схема по умолчанию!");
+        }
+        return solveEquationWithExplicitSchema();
     }
 
     private void intitialValue() {
