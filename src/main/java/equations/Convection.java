@@ -1,5 +1,8 @@
 package equations;
 
+
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.util.Arrays;
 import java.util.Scanner;
 
@@ -17,6 +20,7 @@ public class Convection implements Calculation {
     private double[] u1;
     private double[] u2;
     private double[] x;
+    private String Schema = "Явная схема";
 
     public Convection(double l, double m, double c, int nX, double cfl, double time) {
         L = l;
@@ -46,10 +50,22 @@ public class Convection implements Calculation {
         return solveEquationWithExplicitSchema();
     }
 
-     public void printEquation() {
-         System.out.println("Вывожу решение для уравнения диффузии:");
+    public void printEquation() {
+         System.out.println("Вывожу решение для уравнения конвекции:");
          System.out.println(Arrays.toString(u2));
     }
+
+    @Override
+    public void printEquationInFile() {
+        try {
+            FileOutputStream fileOutputStream = new FileOutputStream("D:/java/IdeaProjects/NumbersMethods/src/main/resources/answer/answer.xls");
+            PrinterOur printerOur = new PrinterOur(fileOutputStream);
+            printerOur.printInExcelFile(x, u2, "конвекция", Schema);
+        } catch (FileNotFoundException e) {
+            System.out.println("Проблемы с открытием файла");
+        }
+    }
+
     private void intitialValue(){
         x[0] = 0;
         for (int i = 1; i < nX; i++){
@@ -76,6 +92,7 @@ public class Convection implements Calculation {
     }
 
     public double[] solveEquationWithLax_WendroffScheme(){
+        Schema = "Лакса-Вендорфа";
         double[] v12 = new double[nX];
         for (int n = 1; n <= nT; n++){
             for (int i = 1; i < nX; i++){

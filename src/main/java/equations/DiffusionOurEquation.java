@@ -3,6 +3,8 @@ package equations;
 import exceptions.NonSquareArray;
 import methods.SweepMethod;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.util.Arrays;
 import java.util.Scanner;
 
@@ -24,6 +26,7 @@ public class DiffusionOurEquation implements Calculation{
     private final double numberFonNeymana; // число Фон-Неймана
     private double[] r;
     private final double Aa;
+    private String Schema = "Явная";
 
     public DiffusionOurEquation(double l, int nx, double time, double density, double w, double numberFonNeymana, double a) {
         L = l;
@@ -44,6 +47,7 @@ public class DiffusionOurEquation implements Calculation{
     }
 
     public double[] solveEquationWithCrankaNicholsonForStocksEquation() {
+        Schema = "Кранк";
         System.out.println("Запущена схема Кранка-Николсона для Обратная вторая задача Стокса в цилиндрической трубе ");
         double A[] = new double[Nx];
         double B[] = new double[Nx];
@@ -126,5 +130,16 @@ public class DiffusionOurEquation implements Calculation{
         System.out.println("Вывожу решение для уравнения диффузии:");
         System.out.println(Arrays.toString(v2));
         return;
+    }
+
+    @Override
+    public void printEquationInFile() {
+        try {
+            FileOutputStream fileOutputStream = new FileOutputStream("D:/java/IdeaProjects/NumbersMethods/src/main/resources/answer/answer.xls");
+            PrinterOur printerOur = new PrinterOur(fileOutputStream);
+            printerOur.printInExcelFile(x, v2, "ОбрЗачСтокса", Schema);
+        } catch (FileNotFoundException e) {
+            System.out.println("Проблемы с открытием файла");
+        }
     }
 }
