@@ -81,7 +81,7 @@ public class Convection implements Calculation {
         System.out.println("Запущена явная схема:");
         for (int n = 1; n <= nT; n++){
             for (int i = 1; i <= nX -1; i++){
-                u2[i] = u1[i] - CFL*(u1[i]-u1[i-1]);
+                u2[i] = u1[i] - (C*dt/h)*(u1[i]-u1[i-1]);
             }
             u2[0] = u2[nX-1];
             for (int i = 0; i < nX; i++){

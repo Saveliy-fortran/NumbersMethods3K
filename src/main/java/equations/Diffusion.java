@@ -39,7 +39,7 @@ public class Diffusion implements Calculation {
         this.density = density;
         Aa = a;
 
-        h = l/nx;
+        h = l/(nx-1);
         dt = numberFonNeymana*pow(h,2)/density;
         nT = (int) (time/dt);
         x = new double[nx];
@@ -105,6 +105,10 @@ public class Diffusion implements Calculation {
                 v1[i] = v2[i];
             }
         }
+        for (int i = 0; i<v2.length; i++){
+            v2[i] = v2[i]/vN;
+            x[i] = x[i]/L;
+        }
         return v2;
     }
 
@@ -141,6 +145,10 @@ public class Diffusion implements Calculation {
             for (int i = 0; i < v2.length; i++) {
                 v1[i] = v2[i];
             }
+        }
+        for (int i = 0; i<v2.length; i++){
+            v2[i] = v2[i]/vN;
+            x[i] = x[i]/L;
         }
         return v2;
     }

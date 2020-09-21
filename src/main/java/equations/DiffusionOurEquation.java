@@ -53,16 +53,16 @@ public class DiffusionOurEquation implements Calculation{
         double B[] = new double[Nx];
         double C[] = new double[Nx];
         double D[] = new double[Nx];
-        for (int t = 0; t <= nT; t++) {
+        for (int t = 1; t <= nT; t++) {
             A[0] = 0;
             B[0] = -1;
             C[0] = 1;
             D[0] = 0;
             for (int i = 1; i < Nx - 1; i++) {
-                A[i] = -density * dt * (r[i] + r[i-1]);
-                B[i] = 4*h*h*r[i] + density*dt*(r[i+1]+r[i]) + density*dt*(r[i]+r[i-1]);
-                C[i] = -density * dt * (r[i+1]+r[i]);
-                D[i] = 4*h*h*dt*r[i]*Aa*sin(w*t*dt) + 4*h*h*r[i]*v1[i]+density*dt* ((r[i]+r[i-1])*(v1[i]-v1[i-1]) - (r[i+1]+r[i])*(v1[i+1]-v1[i]));
+                A[i] = -density * dt * (r[i] + r[i-1])/(4*r[i]*h*h);
+                B[i] = 1  +  density * dt/(4*r[i]*h*h) * (r[i+1]+2*r[i]+r[i-1]);
+                C[i] = -density * dt * (r[i+1]+r[i])/(4*r[i]*h*h);
+                D[i] = Aa*dt*sin(w*dt*t) + (density * dt/(4*r[i]*h*h)) * ((r[i]+r[i-1])*(v1[i]-v1[i-1]) - (r[i+1]+r[i])*(v1[i+1]-v1[i]));
             }
             A[Nx - 1] = 0;
             B[Nx - 1] = 1;

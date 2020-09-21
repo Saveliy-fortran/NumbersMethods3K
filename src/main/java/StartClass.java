@@ -6,7 +6,7 @@ import static java.lang.Math.sin;
 
 public class StartClass {
     public static void main(String[] args) throws NonSquareArray {
-        Calculation solve = new Diffusion(1, 21,0,5, 3, 0.5, 0.0025, -0.5);
+        Calculation solve = new Convection(1, 2, 1, 51, 0.4, 0.4);
         solve.solveEquation();
         solve.printEquation();
         solve.printEquationInFile();
