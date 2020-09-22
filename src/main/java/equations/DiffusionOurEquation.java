@@ -27,6 +27,7 @@ public class DiffusionOurEquation implements Calculation{
     private double[] r;
     private final double Aa;
     private String Schema = "Явная";
+    private double Tetta = 0.5;
 
     public DiffusionOurEquation(double l, int nx, double time, double density, double w, double numberFonNeymana, double a) {
         L = l;
@@ -59,10 +60,10 @@ public class DiffusionOurEquation implements Calculation{
             C[0] = 1;
             D[0] = 0;
             for (int i = 1; i < Nx - 1; i++) {
-                A[i] = -density * dt * (r[i] + r[i-1])/(4*r[i]*h*h);
-                B[i] = 1  +  density * dt/(4*r[i]*h*h) * (r[i+1]+2*r[i]+r[i-1]);
-                C[i] = -density * dt * (r[i+1]+r[i])/(4*r[i]*h*h);
-                D[i] = Aa*dt*sin(w*dt*t) + (density * dt/(4*r[i]*h*h)) * ((r[i]+r[i-1])*(v1[i]-v1[i-1]) - (r[i+1]+r[i])*(v1[i+1]-v1[i]));
+                A[i] = - Tetta * density * dt * (r[i] + r[i-1])/(2*r[i]*h*h);
+                B[i] = 1  +  Tetta * density * dt/(2*r[i]*h*h) * (r[i+1]+2*r[i]+r[i-1]);
+                C[i] = -density * Tetta * dt * (r[i+1]+r[i])/(2*r[i]*h*h);
+                D[i] = Aa*dt*sin(w*dt*(t+0.5)) +v1[i] + (density *(1-Tetta) * dt/(2*r[i]*h*h)) * (-(r[i]+r[i-1])*(v1[i]-v1[i-1]) + (r[i+1]+r[i])*(v1[i+1]-v1[i]));
             }
             A[Nx - 1] = 0;
             B[Nx - 1] = 1;
@@ -112,12 +113,12 @@ public class DiffusionOurEquation implements Calculation{
     }
 
     private void intitialValue() {
-        x[0] = 0;
+        x[0] = 1;
         v1[0] = 0;
         v2[0] = 0;
-        r[0] = 0;
+        r[0] = 1;
         for(int i = 1; i < Nx; i++){
-            x[i] = x[i-1] + h;
+            x[i] = x[i-1]+h;
             v1[i] = 0;
             v2[i] = 0;
             r[i] = r[i-1] + h;
@@ -135,11 +136,11 @@ public class DiffusionOurEquation implements Calculation{
     @Override
     public void printEquationInFile() {
         try {
-            FileOutputStream fileOutputStream = new FileOutputStream("D:/java/IdeaProjects/NumbersMethods/src/main/resources/answer/answer.xls");
+            FileOutputStream fileOutputStream = new FileOutputStream("D:/Учеба/src/main/java/answerTwo.xlsx");
             PrinterOur printerOur = new PrinterOur(fileOutputStream);
             printerOur.printInExcelFile(x, v2, "ОбрЗачСтокса", Schema);
         } catch (FileNotFoundException e) {
-            System.out.println("Проблемы с открытием файла");
+            System.out.println("Проблемы с открытием файла " + e.toString() );
         }
     }
 }
