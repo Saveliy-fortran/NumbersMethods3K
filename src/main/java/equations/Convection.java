@@ -34,6 +34,7 @@ public class Convection implements Calculation {
         u1 = new double[nX];
         u2 = new double[nX];
         x = new double[nX];
+        System.out.println((int)(time/dt));
     }
 
 
@@ -58,7 +59,7 @@ public class Convection implements Calculation {
     @Override
     public void printEquationInFile() {
         try {
-            FileOutputStream fileOutputStream = new FileOutputStream("D:/java/IdeaProjects/NumbersMethods/src/main/resources/answer/answer.xls");
+            FileOutputStream fileOutputStream = new FileOutputStream("D:/java/IdeaProjects/NumbersMethods/src/main/java/equations/answer.xls");
             PrinterOur printerOur = new PrinterOur(fileOutputStream);
             printerOur.printInExcelFile(x, u2, "конвекция", Schema);
         } catch (FileNotFoundException e) {
@@ -95,15 +96,16 @@ public class Convection implements Calculation {
         Schema = "Лакса-Вендорфа";
         double[] v12 = new double[nX];
         for (int n = 1; n <= nT; n++){
-            for (int i = 1; i < nX; i++){
                 for(int j = 0; j < nX - 1; j++){
-                    v12[j] = 0.5*(u1[j+1] + u1[j]) - CFL*(u1[j+1] - u1[j])/2.0;
+                    v12[j] = 0.5*(u1[j+1] + u1[j]) - (C*dt/h)*(u1[j+1] - u1[j])/2.0;
                 }
+            for (int i = 1; i < nX-1; i++){
                 u2[i] = u1[i] - CFL*(v12[i] - v12[i-1]);
             }
+            u2[nX-1] = (u2[1]+u2[nX-2])/2;
             u2[0] = u2[nX-1];
-            for (int i = 0; i < nX; i++){
-                u1[i] = u2[i];
+            for (int p = 0; p < nX; p++){
+                u1[p] = u2[p];
             }
         }
         return u2;

@@ -113,10 +113,10 @@ public class DiffusionOurEquation implements Calculation{
     }
 
     private void intitialValue() {
-        x[0] = 1;
+        x[0] = 0;
         v1[0] = 0;
         v2[0] = 0;
-        r[0] = 1;
+        r[0] = 0;
         for(int i = 1; i < Nx; i++){
             x[i] = x[i-1]+h;
             v1[i] = 0;
@@ -136,7 +136,7 @@ public class DiffusionOurEquation implements Calculation{
     @Override
     public void printEquationInFile() {
         try {
-            FileOutputStream fileOutputStream = new FileOutputStream("D:/Учеба/src/main/java/answerTwo.xlsx");
+            FileOutputStream fileOutputStream = new FileOutputStream("D:/java/IdeaProjects/NumbersMethods/src/main/java/equations/answer.xls");
             PrinterOur printerOur = new PrinterOur(fileOutputStream);
             printerOur.printInExcelFile(x, v2, "ОбрЗачСтокса", Schema);
         } catch (FileNotFoundException e) {
