@@ -9,7 +9,7 @@ import java.util.Scanner;
 import java.util.function.Function;
 
 public class BurgersEquation implements Calculation {
-    private final double time;
+    private final int time;
     private final double L;
     private final int nX;
     private final double dt;
@@ -17,14 +17,16 @@ public class BurgersEquation implements Calculation {
     private double[] u2;
     private double[] r;
     private double h;
+    private final double Currant;
     private Function<Double, Double> initialStartValue;
     private String Schema = "Явная";
 
-    public BurgersEquation(double time, double l, int nX, double dt, Function<Double, Double> initialStartValue) {
+    public BurgersEquation( double l, int nX, int time, double currant, Function<Double, Double> initialStartValue) {
         this.time = time;
         L = l;
         this.nX = nX;
-        this.dt = dt;
+        this.dt = currant*l/(nX-1);
+        Currant = currant;
         this.initialStartValue = initialStartValue;
 
         h = l/(nX-1);
@@ -38,14 +40,29 @@ public class BurgersEquation implements Calculation {
     public double[] solveEquation() throws NonSquareArray {
         Scanner scanner = new Scanner(System.in);
         intitialValue();
-        System.out.print("Выберите схему: LV (Cхема Лакса-Вендроффа), ES(Явная схема) :\n> ");
+        System.out.print("Выберите схему: LV (Cхема Лакса-Вендроффа), ES(Явная схема), TT(Точное решение) :\n> ");
         String output = scanner.next();
         switch (output){
             case "LV" : return solveEquationWithLax_WendroffScheme();
             case "ES" : return solveEquationWithExplicitSchema();
+            case "TT" : return tochnoeSolution();
             default: System.out.println("Запущена схема по умолчанию!");
         }
         return solveEquationWithExplicitSchema();
+    }
+
+    public double[] tochnoeSolution(){
+        double timer = dt*time;
+        for(int i = 0; i < nX; i++){
+            if((r[i] - L/2)/timer <= 1){
+                u2[i] = 1;
+            } else if ((r[i] - L/2)/timer > 1 && (r[i] - L/2)/timer < 2) {
+                u2[i] = (r[i] - L/2)/timer;
+            } else if((r[i] - L/2)/timer >= 2){
+                u2[i] = 2;
+            }
+        }
+        return u2;
     }
 
     @Override
@@ -57,7 +74,7 @@ public class BurgersEquation implements Calculation {
     @Override
     public void printEquationInFile() {
         try {
-            FileOutputStream fileOutputStream = new FileOutputStream("D:/java/IdeaProjects/NumbersMethods/src/main/resources/answer/answer.xls");
+            FileOutputStream fileOutputStream = new FileOutputStream("D:/java/IdeaProjects/NumbersMethods/src/main/java/equations/answer.xls");
             PrinterOur printerOur = new PrinterOur(fileOutputStream);
             printerOur.printInExcelFile(r, u2, "Бургерс", Schema);
         } catch (FileNotFoundException e) {
@@ -67,17 +84,20 @@ public class BurgersEquation implements Calculation {
 
     public double[] solveEquationWithExplicitSchema(){
         System.out.println("Запущена явная схема:");
-        double t = dt;
-        while (t <= time){
-            for (int i = 1; i < nX; i++){
-                u2[i] = u1[i] - (dt/h) * (0.5*u1[i]*u1[i] - 0.5*u1[i-1]*u1[i-1]);
+        for (int t = 0; t < time; t++){
+            for(int i = 1; i < nX-1; i++){
+                if(u1[i]>0){
+                    u2[i] = u1[i] - dt / (2 * h) * (u1[i]*u1[i] - u1[i-1]*u1[i-1]);
+                } else {
+                    u2[i] = u1[i] - dt / (2 * h) * (u1[i + 1]*u1[i + 1] - u1[i]*u1[i]);
+                }
             }
-            u2[0] = u2[nX-1];
+            u2[0] = 1;
+            u2[nX-1] = 2;
 
             for(int i = 0; i < nX; i++){
                 u1[i] = u2[i];
             }
-            t = t + dt;
         }
         return u2;
     }
@@ -85,19 +105,18 @@ public class BurgersEquation implements Calculation {
     public double[] solveEquationWithLax_WendroffScheme(){
         Schema = "Лакса-Вендорфа";
         double[] v12 = new double[nX];
-        double t = dt;
-        while (t <= time){
+        for (int t = 0; t < time; t++){
             for(int j = 0; j < nX - 1; j++){
                 v12[j] = 0.5*(0.5*u1[j+1]*u1[j+1] + 0.5*u1[j]*u1[j]) - 0.5*(dt/h)*(u1[j+1] - u1[j]);
             }
             for (int i = 1; i < nX; i++){
                 u2[i] = u1[i] - (dt/h)*(v12[i] - v12[i-1]);
             }
-            u2[0] = u2[nX-1];
+            u2[0] = 1;
+            u2[nX-1] = 2;
             for (int j = 0; j < nX; j++){
                 u1[j] = u2[j];
             }
-            t = t + dt;
         }
         return u2;
     }
@@ -111,6 +130,5 @@ public class BurgersEquation implements Calculation {
         for (int i = 0; i < nX; i++){
             u1[i] = initialStartValue.apply(r[i]);
         }
-        System.out.println(Arrays.toString(u1));
     }
 }
